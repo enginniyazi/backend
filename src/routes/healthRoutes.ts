@@ -4,6 +4,144 @@ import mongoose from 'mongoose';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Health
+ *   description: Sistem sağlığı kontrolü
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     HealthStatus:
+ *       type: object
+ *       properties:
+ *         status:
+ *           type: string
+ *           enum: [OK, ERROR]
+ *           description: Sistem durumu
+ *         timestamp:
+ *           type: string
+ *           format: date-time
+ *           description: Kontrol zamanı
+ *         uptime:
+ *           type: number
+ *           description: Sistem çalışma süresi (saniye)
+ *         environment:
+ *           type: string
+ *           description: Çalışma ortamı
+ *         database:
+ *           type: string
+ *           enum: [connected, disconnected]
+ *           description: Veritabanı bağlantı durumu
+ *         memory:
+ *           type: object
+ *           properties:
+ *             used:
+ *               type: number
+ *               description: Kullanılan bellek (MB)
+ *             total:
+ *               type: number
+ *               description: Toplam bellek (MB)
+ */
+
+/**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: Sistem sağlığı kontrolü
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Sistem sağlıklı
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthStatus'
+ *       503:
+ *         description: Sistem sağlıksız
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                 message:
+ *                   type: string
+ *                   example: "Service unavailable"
+ */
+
+/**
+ * @swagger
+ * /api/health/detailed:
+ *   get:
+ *     summary: Detaylı sistem sağlığı kontrolü
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Detaylı sistem durumu
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   enum: [OK, ERROR]
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                 uptime:
+ *                   type: number
+ *                 environment:
+ *                   type: string
+ *                 version:
+ *                   type: string
+ *                 database:
+ *                   type: object
+ *                   properties:
+ *                     status:
+ *                       type: string
+ *                       enum: [connected, disconnected]
+ *                     host:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                 memory:
+ *                   type: object
+ *                 cpu:
+ *                   type: object
+ *                 platform:
+ *                   type: string
+ *                 nodeVersion:
+ *                   type: string
+ *       503:
+ *         description: Sistem sağlıksız
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ERROR"
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                 message:
+ *                   type: string
+ *                   example: "Service unavailable"
+ *                 error:
+ *                   type: string
+ */
+
 // Health check endpoint
 router.get('/', async (req, res) => {
     try {

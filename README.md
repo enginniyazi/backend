@@ -66,6 +66,27 @@ npm run build
 npm start
 ```
 
+## 📚 API Dokümantasyonu
+
+### 📖 Swagger UI
+API'nin interaktif dokümantasyonuna erişmek için:
+```
+http://localhost:5001/api/docs
+```
+
+### 📋 Postman Collection
+Postman ile API'yi test etmek için:
+1. `Yowa_Academy_API.postman_collection.json` dosyasını Postman'e import edin
+2. Collection variables'da `base_url` değerini ayarlayın
+3. "Login User" request'ini çalıştırarak JWT token alın
+4. Diğer request'leri test edin
+
+### 🔗 Ana Sayfa
+API'nin genel bilgileri için:
+```
+http://localhost:5001/
+```
+
 ## 📚 API Endpoints
 
 ### Authentication

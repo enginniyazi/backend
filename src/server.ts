@@ -17,6 +17,11 @@ import applicationRoutes from './routes/applicationRoutes.js';
 import campaignRoutes from './routes/campaignRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
+import homeRoutes from './routes/homeRoutes.js';
+
+// Swagger dokümantasyonu
+import swaggerUi from 'swagger-ui-express';
+import { specs } from './config/swagger.js';
 
 // Middleware'leri import ediyoruz
 import { errorHandler } from './middleware/errorMiddleware.js';
@@ -39,6 +44,9 @@ app.use(generalRateLimit); // Genel rate limiting
 const __dirname = path.resolve(path.dirname(''));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Ana Sayfa
+app.use('/', homeRoutes);
+
 // API Rotaları
 app.use('/api/health', healthRoutes); // Health check endpoint'leri
 app.use('/api/auth', authRoutes);
@@ -48,6 +56,13 @@ app.use('/api/instructors', instructorRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/coupons', couponRoutes);
+
+// Swagger Dokümantasyonu
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Yowa Academy API Documentation',
+  customfavIcon: '/favicon.ico',
+}));
 
 // Hata Yönetimi
 app.use(errorHandler);
