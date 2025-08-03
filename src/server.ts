@@ -1,10 +1,12 @@
 // src/server.ts
 
 import express from 'express';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
+
+// Konfigürasyon dosyalarını import ediyoruz
+import { connectDB } from './config/database.js';
 
 // Tüm rota dosyalarını import ediyoruz
 import authRoutes from './routes/authRoutes.js';
@@ -14,8 +16,11 @@ import instructorRoutes from './routes/instructorRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
 import campaignRoutes from './routes/campaignRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
+import healthRoutes from './routes/healthRoutes.js';
 
+// Middleware'leri import ediyoruz
 import { errorHandler } from './middleware/errorMiddleware.js';
+import { generalRateLimit, authRateLimit } from './middleware/rateLimitMiddleware.js';
 
 dotenv.config();
 
@@ -24,22 +29,25 @@ dotenv.config();
 export const app = express();
 
 // Middleware'ler
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000' }));
 app.use(express.json());
+
+// Rate limiting middleware'leri - Auth endpoint'lerini hariç tut
+app.use(generalRateLimit); // Genel rate limiting
 
 // Statik dosya servisi
 const __dirname = path.resolve(path.dirname(''));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API Rotaları
+app.use('/api/health', healthRoutes); // Health check endpoint'leri
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/instructors', instructorRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/campaigns', campaignRoutes);
-// DİKKAT: Bir önceki kodunda burada bir yazım hatası vardı ('couponRoutes' yerine 'coupon'), düzelttim.
-app.use('/api/coupons', couponRoutes); 
+app.use('/api/coupons', couponRoutes);
 
 // Hata Yönetimi
 app.use(errorHandler);
@@ -47,21 +55,18 @@ app.use(errorHandler);
 // --- BAŞLATMA MANTIĞI ---
 
 const PORT = process.env.PORT || 5001;
-const mongoUri = process.env.MONGO_URI;
 
 const start = async () => {
-  // Bu 'start' fonksiyonu, hem veritabanına bağlanır hem de sunucuyu dinler.
-  if (!mongoUri) {
-    throw new Error('MONGO_URI ortam değişkeni tanımlanmamış.');
-  }
   try {
-    await mongoose.connect(mongoUri);
-    console.log('MongoDB veritabanı bağlantısı başarılı!');
+    // Veritabanı bağlantısı
+    await connectDB();
+
+    // Sunucuyu başlat
     app.listen(PORT, () => {
       console.log(`Sunucu, http://localhost:${PORT} adresinde dinleniyor.`);
     });
   } catch (error) {
-    console.error('Veritabanı bağlantı hatası:', error);
+    console.error('Sunucu başlatma hatası:', error);
     process.exit(1);
   }
 };

@@ -64,6 +64,14 @@ export const validateLogin = (req: Request, res: Response, next: NextFunction) =
 
 // Course creation validation
 export const validateCourse = (req: Request, res: Response, next: NextFunction) => {
+    // Dosya yükleme sırasında req.body undefined olabilir
+    if (!req.body) {
+        return res.status(400).json({
+            message: 'Validation hatası',
+            errors: ['Request body bulunamadı.'],
+        });
+    }
+
     const { title, description, price, category } = req.body;
     const errors: string[] = [];
 
