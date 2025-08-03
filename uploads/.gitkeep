@@ -1,0 +1,2 @@
+# Bu dosya uploads klasörünün git tarafından takip edilmesini sağlar
+# Klasör boş olsa bile git'e dahil edilir 
