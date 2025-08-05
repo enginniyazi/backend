@@ -64,16 +64,30 @@ export const validateLogin = (req: Request, res: Response, next: NextFunction) =
 
 // Course creation validation
 export const validateCourse = (req: Request, res: Response, next: NextFunction) => {
-    // Dosya yükleme sırasında req.body undefined olabilir
+    // Dosya yükleme sırasında req.body'nin varlığını kontrol edelim
     if (!req.body) {
         return res.status(400).json({
             message: 'Validation hatası',
-            errors: ['Request body bulunamadı.'],
+            errors: ['İstek gövdesi (body) bulunamadı.'],
         });
     }
 
-    const { title, description, price, category } = req.body;
+    const { title, description, price } = req.body;
+    let { categories } = req.body; // 'categories'i 'let' ile tanımlıyoruz
     const errors: string[] = [];
+
+    // --- BU, TÜM SORUNU ÇÖZEN BLOKTUR ---
+    // Gelen 'categories' verisini her zaman bir diziye çeviriyoruz.
+    if (categories && !Array.isArray(categories)) {
+        // Eğer 'categories' varsa ama bir dizi değilse (yani tek bir string ise),
+        // onu tek elemanlı bir diziye dönüştür.
+        categories = [categories];
+    } else if (!categories) {
+        // Eğer 'categories' hiç gelmediyse, boş bir dizi olarak ata.
+        // Bu, aşağıdaki 'categories.length === 0' kontrolünün çalışmasını sağlar.
+        categories = [];
+    }
+    // ------------------------------------------
 
     if (!title || title.trim().length < 3) {
         errors.push('Kurs başlığı en az 3 karakter olmalıdır.');
@@ -83,20 +97,28 @@ export const validateCourse = (req: Request, res: Response, next: NextFunction) 
         errors.push('Kurs açıklaması en az 10 karakter olmalıdır.');
     }
 
-    if (!price || isNaN(Number(price)) || Number(price) < 0) {
+    if (price === undefined || isNaN(Number(price)) || Number(price) < 0) {
         errors.push('Geçerli bir fiyat giriniz.');
     }
 
-    if (!category) {
-        errors.push('Kategori seçimi gereklidir.');
+    // Artık 'categories'in her zaman bir dizi olduğundan eminiz.
+    if (categories.length === 0) {
+        errors.push('En az bir kategori seçimi gereklidir.');
+    } else {
+        // Bonus: Dizideki her bir elemanın geçerli bir MongoDB ID'si olup olmadığını da kontrol edebiliriz.
+        // (Bu adım şimdilik isteğe bağlı)
     }
 
     if (errors.length > 0) {
         return res.status(400).json({
-            message: 'Validation hatası',
+            message: 'Lütfen aşağıdaki hataları düzeltin:',
             errors,
         });
     }
 
+    // Validasyon başarılıysa, normalleştirilmiş 'categories' dizisini
+    // bir sonraki adıma (controller'a) aktarmak için req.body'yi güncelleyebiliriz.
+    req.body.categories = categories;
+
     next();
-}; 
+};

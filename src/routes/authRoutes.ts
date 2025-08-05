@@ -1,9 +1,9 @@
 // src/routes/authRoutes.ts
 
 import { Router } from 'express';
-import { registerUser, loginUser, updateUserAvatar } from '../controllers/authController.js';
+import { registerUser, loginUser, updateUserAvatar, updateUserProfile, getAllUsers, getUserById, updateUserById, deleteUserById } from '../controllers/authController.js';
 import upload from '../middleware/uploadMiddleware.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { protect, authorize } from '../middleware/authMiddleware.js';
 import { validateRegistration, validateLogin } from '../middleware/validationMiddleware.js';
 
 const router = Router();
@@ -92,7 +92,7 @@ router.post('/register', validateRegistration, registerUser);
  *                 type: string
  *                 format: email
  *                 description: E-posta adresi
- *                 example: "ahmet@example.com"
+ *                 example: "test@example.com"
  *               password:
  *                 type: string
  *                 description: Şifre
@@ -167,8 +167,150 @@ router.post('/login', validateLogin, loginUser);
  */
 router.put('/profile/avatar', protect, upload.single('avatar'), updateUserAvatar);
 
-router.post('/register', validateRegistration, registerUser);
-router.post('/login', validateLogin, loginUser);
-router.put('/profile/avatar', protect, upload.single('avatar'), updateUserAvatar);
+/**
+ * @swagger
+ * /api/auth/profile:
+ *   put:
+ *     summary: Giriş yapmış kullanıcının profil bilgilerini günceller
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Kullanıcının yeni adı ve soyadı
+ *                 example: "Engin Niyazi Ergül"
+ *     responses:
+ *       200:
+ *         description: Profil bilgileri başarıyla güncellendi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Yetkilendirme hatası (token yok veya geçersiz)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: Kullanıcı bulunamadı
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.put('/profile',protect, updateUserProfile);
 
+/**
+ * @swagger
+ * /api/auth:
+ *   get:
+ *     summary: Tüm kullanıcıları listeler
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Kullanıcıların listesi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       403:
+ *         description: Admin yetkisi gerekli
+ */
+router.get('/',protect, authorize('Admin'), getAllUsers);
+
+
+/**
+ * @swagger
+ * /api/auth/{id}:
+ *   get:
+ *     summary: Tek bir kullanıcıyı ID ile getirir
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Kullanıcı ID'si
+ *     responses:
+ *       200:
+ *         description: Kullanıcı detayları
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       404:
+ *         description: Kullanıcı bulunamadı
+*/
+router.get('/:id',protect, authorize('Admin'),getUserById);
+
+
+/**
+ * @swagger
+ * /api/auth/{id}:
+ *   put:
+ *     summary: Bir kullanıcının bilgilerini günceller
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [Student, Instructor, Admin]
+ *     responses:
+ *       200:
+ *         description: Güncellenmiş kullanıcı bilgileri
+ */
+router.put('/:id',protect, authorize('Admin'),updateUserById);
+
+
+/**
+ * @swagger
+ * /api/auth/{id}:
+ *    delete:
+ *     summary: Bir kullanıcıyı siler
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Kullanıcı başarıyla silindi
+ */
+router.delete('/:id',protect, authorize('Admin'),deleteUserById)
 export default router;

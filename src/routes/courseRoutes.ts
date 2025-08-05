@@ -8,7 +8,13 @@ import {
     deleteCourse,
     togglePublishStatus,
     getMyCourses,
-    getAllCoursesForAdmin
+    getAllCoursesForAdmin,
+    addLectureToSection,
+    addSectionToCourse,
+    updateSection,
+    deleteSection,
+    updateLecture,
+    deleteLecture
 } from '../controllers/courseController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 import upload from '../middleware/uploadMiddleware.js';
@@ -352,6 +358,152 @@ router.put('/:id', protect, authorize('Instructor', 'Admin'), upload.single('cov
  */
 router.delete('/:id', protect, authorize('Instructor', 'Admin'), deleteCourse);
 
+/**
+ * @swagger
+ * /api/courses/{courseId}/sections:
+ *   post:
+ *     summary: Bir kursa yeni bir bölüm ekler
+ *     tags: [Course Content Management]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Giriş ve Temel Kavramlar"
+ *     responses:
+ *       201:
+ *         description: Bölüm başarıyla oluşturuldu
+ */
+router.post('/:courseId/sections', protect, authorize('Instructor', 'Admin'), addSectionToCourse);
+
+/**
+ * @swagger
+ * /api/courses/{courseId}/sections/{sectionId}:
+ *   put:
+ *     summary: Mevcut bir bölümü günceller
+ *     tags: [Course Content Management]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - { in: path, name: courseId, required: true, schema: { type: string } }
+ *       - { in: path, name: sectionId, required: true, schema: { type: string } }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Giriş ve Temel React Kavramları"
+ *     responses:
+ *       200:
+ *         description: Bölüm başarıyla güncellendi
+ *   delete:
+ *     summary: Bir bölümü kurstan siler
+ *     tags: [Course Content Management]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - { in: path, name: courseId, required: true, schema: { type: string } }
+ *       - { in: path, name: sectionId, required: true, schema: { type: string } }
+ *     responses:
+ *       200:
+ *         description: Bölüm başarıyla silindi
+ */
+router.put('/:courseId/sections/:sectionId', protect, authorize('Instructor', 'Admin'), updateSection);
+router.delete('/:courseId/sections/:sectionId', protect, authorize('Instructor', 'Admin'), deleteSection);
+
+/**
+ * @swagger
+ * /api/courses/{courseId}/sections/{sectionId}/lectures:
+ *   post:
+ *     summary: Bir bölüme yeni bir ders ekler
+ *     tags: [Course Content Management]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - { in: path, name: courseId, required: true, schema: { type: string } }
+ *       - { in: path, name: sectionId, required: true, schema: { type: string } }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "React Nedir?"
+ *               duration:
+ *                 type: number
+ *                 example: 15
+ *               videoUrl:
+ *                 type: string
+ *                 example: "https://youtube.com/watch?v=..."
+ *     responses:
+ *       201:
+ *         description: Ders başarıyla eklendi
+ */
+router.post('/:courseId/sections/:sectionId/lectures', protect, authorize('Instructor', 'Admin'), addLectureToSection);
+
+
+/**
+ * @swagger
+ * /api/courses/{courseId}/sections/{sectionId}/lectures/{lectureId}:
+ *   put:
+ *     summary: Mevcut bir dersi günceller
+ *     tags: [Course Content Management]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - { in: path, name: courseId, required: true, schema: { type: string } }
+ *       - { in: path, name: sectionId, required: true, schema: { type: string } }
+ *       - { in: path, name: lectureId, required: true, schema: { type: string } }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title: { type: string }
+ *               duration: { type: number }
+ *     responses:
+ *       200:
+ *         description: Ders başarıyla güncellendi
+ */
+router.put('/:courseId/sections/:sectionId/lectures/:lectureId', protect, authorize('Instructor', 'Admin'), updateLecture);
+
+/**
+ * @swagger
+ * /api/courses/{courseId}/sections/{sectionId}/lectures/{lectureId}:
+ *   delete:
+ *     summary: Bir dersi bölümden siler
+ *     tags: [Course Content Management]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - { in: path, name: courseId, required: true, schema: { type: string } }
+ *       - { in: path, name: sectionId, required: true, schema: { type: string } }
+ *       - { in: path, name: lectureId, required: true, schema: { type: string } }
+ *     responses:
+ *       200:
+ *         description: Ders başarıyla silindi
+ */
+router.delete('/:courseId/sections/:sectionId/lectures/:lectureId', protect, authorize('Instructor', 'Admin'), deleteLecture);
 
 
 export default router;

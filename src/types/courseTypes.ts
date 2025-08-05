@@ -1,4 +1,4 @@
-import { Document, PopulatedDoc, Types } from 'mongoose';
+import { Document, HydratedDocument, PopulatedDoc, Types } from 'mongoose';
 import { IUser } from './userTypes.js';
 import { ICategory } from './categoryTypes.js';
 
@@ -25,3 +25,5 @@ export interface ICourse extends Document{
     coverImage: string;
     isPublished: boolean;
 }
+
+export type HydratedCourseDocument = HydratedDocument<ICourse>;

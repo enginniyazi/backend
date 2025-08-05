@@ -143,3 +143,114 @@ export const updateUserAvatar = async (req: Request, res: Response, next: NextFu
     next(error);
   }
 };
+
+// @desc    Giriş yapmış kullanıcının profil bilgilerini (ad vb.) günceller
+// @route   PUT /api/auth/profile
+export const updateUserProfile = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await User.findById(req.user!._id);
+
+        if (!user) {
+            res.status(404);
+            throw new Error('Kullanıcı bulunamadı.');
+        }
+
+        // Gelen verilerle güncelleme yap.
+        // E-posta gibi hassas verilerin değiştirilmesini şimdilik engelliyoruz.
+        user.name = req.body.name || user.name;
+        // Gelecekte buraya 'birthDate' gibi başka alanlar da eklenebilir.
+
+        const updatedUser = await user.save();
+
+        // Frontend'in AuthContext'i güncelleyebilmesi için tam kullanıcı verisini döndürelim.
+        const userData = {
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            avatar: updatedUser.avatar,
+            role: updatedUser.role,
+        };
+
+        res.status(200).json(userData);
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Tüm kullanıcıları listeler (Sadece Admin)
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        // Şifreler ve hassas veriler hariç tüm kullanıcıları getir
+        const users = await User.find({}).select('-password'); 
+        res.status(200).json(users);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Admin tarafından tek bir kullanıcıyı ID ile getirir
+// @route   GET /api/users/:id
+export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await User.findById(req.params.id).select('-password');
+        if (user) {
+            res.status(200).json(user);
+        } else {
+            res.status(404);
+            throw new Error('Kullanıcı bulunamadı.');
+        }
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Admin tarafından bir kullanıcıyı günceller
+// @route   PUT /api/users/:id
+export const updateUserById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            res.status(404);
+            throw new Error('Kullanıcı bulunamadı.');
+        }
+
+        // Adminin değiştirebileceği alanları güncelle
+        user.name = req.body.name || user.name;
+        user.email = req.body.email || user.email;
+        user.role = req.body.role || user.role;
+
+        const updatedUser = await user.save();
+
+        res.status(200).json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            role: updatedUser.role,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Admin tarafından bir kullanıcıyı siler
+// @route   DELETE /api/users/:id
+export const deleteUserById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            res.status(404);
+            throw new Error('Kullanıcı bulunamadı.');
+        }
+        
+        // TODO: Bu kullanıcıya ait kurslar, profiller vb. varsa ne yapılmalı?
+        // Bu, daha karmaşık "cascade delete" mantığı gerektirir.
+        // Şimdilik sadece kullanıcıyı siliyoruz.
+        
+        await User.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: 'Kullanıcı başarıyla silindi.' });
+    } catch (error) {
+        next(error);
+    }
+};
