@@ -32,13 +32,13 @@ dotenv.config();
 
 // app nesnesini oluşturup testler için export ediyoruz
 export const app = express();
-const corsOptions = {
-  // .env dosyasından FRONTEND_URL'i oku, eğer yoksa localhost'u kullan
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  optionsSuccessStatus: 200,
-};
+
 // Middleware'ler
-app.use(cors());
+app.use(cors({
+  origin: '*', // Şimdilik HERKESE izin vererek sorunun CORS'tan olup olmadığını teyit edelim.
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // İzin verilen metotlar
+  allowedHeaders: ['Content-Type', 'Authorization'], // İzin verilen başlıklar
+}));
 app.use(express.json());
 
 // Rate limiting middleware'leri - Auth endpoint'lerini hariç tut
