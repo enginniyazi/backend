@@ -16,7 +16,8 @@
     "clean": "rm -rf dist",
     "prebuild": "npm run clean",
     "seed": "tsx seeder/seeder.ts",
-    "seed:destroy": "tsx seeder/seeder.ts -d"
+    "seed:destroy": "tsx seeder/seeder.ts -d",
+    "postinstall": "npm run build"
   },
   "keywords": [],
   "author": "",
