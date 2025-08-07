@@ -38,7 +38,7 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 // Middleware'ler
-app.use(cors);
+app.use(cors());
 app.use(express.json());
 
 // Rate limiting middleware'leri - Auth endpoint'lerini hariç tut
