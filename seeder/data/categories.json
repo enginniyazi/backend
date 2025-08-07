@@ -1,0 +1,18 @@
+[
+  {
+    "name": "Web Geliştirme",
+    "description": "Modern web teknolojileri üzerine kurslar."
+  },
+  {
+    "name": "Mobil Geliştirme",
+    "description": "iOS ve Android için uygulama geliştirme."
+  },
+  {
+    "name": "Veri Bilimi",
+    "description": "Python ile veri analizi ve makine öğrenmesi."
+  },
+  {
+    "name": "UI/UX Tasarım",
+    "description": "Kullanıcı dostu arayüzler tasarlama."
+  }
+]

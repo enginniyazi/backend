@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Yaz Fırsatları Başladı!",
+    "description": "Tüm Web Geliştirme kurslarında %30'a varan indirimleri kaçırmayın!",
+    "startDate": "2025-06-01T00:00:00.000Z",
+    "endDate": "2025-08-31T23:59:59.000Z",
+    "isActive": true
+  },
+  {
+    "title": "Yeni Yıl, Yeni Kariyer!",
+    "description": "Mobil Geliştirme kurslarımızla geleceğinize yatırım yapın.",
+    "startDate": "2026-01-01T00:00:00.000Z",
+    "endDate": "2026-01-31T23:59:59.000Z",
+    "isActive": false
+  }
+]

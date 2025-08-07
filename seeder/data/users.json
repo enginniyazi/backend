@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Admin User",
+    "email": "admin@yowa.com",
+    "password": "123456",
+    "role": "Admin"
+  },
+  {
+    "name": "Ali Veli (Eğitmen)",
+    "email": "instructor@yowa.com",
+    "password": "123456",
+    "role": "Instructor"
+  },
+  {
+    "name": "Zeynep Kaya (Eğitmen)",
+    "email": "instructor2@yowa.com",
+    "password": "123456",
+    "role": "Instructor"
+  },
+  {
+    "name": "Ayşe Yılmaz (Öğrenci)",
+    "email": "student@yowa.com",
+    "password": "123456",
+    "role": "Student"
+  },
+  {
+    "name": "Mehmet Can (Öğrenci)",
+    "email": "student2@yowa.com",
+    "password": "123456",
+    "role": "Student"
+  }
+]

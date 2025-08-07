@@ -1,0 +1,242 @@
+[
+  {
+    "title": "Modern Full-Stack Web Geliştirme: MERN Stack",
+    "description": "Sıfırdan başlayarak, MongoDB, Express, React ve Node.js (MERN) yığınını kullanarak tam kapsamlı, modern ve gerçek dünya projeleri geliştirin. Bu kurs, API tasarımından interaktif arayüzlere kadar her adımı kapsar.",
+    "price": 25000,
+    "coverImage": "uploads/course-covers/coverImage-1754079186733.png",
+    "isPublished": true,
+    "sections": [
+      {
+        "title": "Backend Kurulumu (Node.js & Express)",
+        "lectures": [
+          { "title": "Node.js Temelleri ve NPM", "duration": 25 },
+          { "title": "Express.js ile API Oluşturma", "duration": 40 },
+          { "title": "Middleware Mimarisi", "duration": 35 },
+          { "title": "MongoDB ve Mongoose Entegrasyonu", "duration": 50 }
+        ]
+      },
+      {
+        "title": "Frontend Geliştirme (React)",
+        "lectures": [
+          { "title": "React Component Yapısı ve JSX", "duration": 60 },
+          { "title": "State ve Props Yönetimi", "duration": 45 },
+          { "title": "React Hooks (useState, useEffect)", "duration": 75 },
+          { "title": "API'den Veri Çekme ve Gösterme", "duration": 55 }
+        ]
+      },
+      {
+        "title": "İleri Seviye Konular ve Proje",
+        "lectures": [
+          { "title": "Kullanıcı Kimlik Doğrulama (JWT)", "duration": 80 },
+          { "title": "Global State Yönetimi (Context API)", "duration": 70 },
+          { "title": "Proje Deployment (Vercel & Render)", "duration": 60 },
+          { "title": "Test Temelleri (Jest & Supertest)", "duration": 50 }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "React Native ile Mobil Uygulama Geliştirme",
+    "description": "Tek bir JavaScript/React kod tabanıyla hem iOS hem de Android için profesyonel, native mobil uygulamalar geliştirmeyi öğrenin. Expo ve React Navigation gibi temel araçlarda ustalaşın.",
+    "price": 30000,
+    "coverImage": "uploads/course-covers/coverImage-1754079228979.png",
+    "isPublished": true,
+    "sections": [
+      {
+        "title": "Temel Kurulum ve Bileşenler",
+        "lectures": [
+          { "title": "Geliştirme Ortamının Kurulumu", "duration": 30 },
+          { "title": "Temel Bileşenler (View, Text, Image)", "duration": 40 },
+          { "title": "Styling in React Native", "duration": 50 },
+          { "title": "Flexbox ile Layout Tasarımı", "duration": 60 }
+        ]
+      },
+      {
+        "title": "Navigasyon ve Veri Yönetimi",
+        "lectures": [
+          { "title": "React Navigation Kurulumu", "duration": 35 },
+          { "title": "Stack ve Tab Navigator", "duration": 55 },
+          { "title": "API İstekleri ve Axios", "duration": 45 },
+          { "title": "Lokal Veri Saklama (AsyncStorage)", "duration": 40 }
+        ]
+      },
+      {
+        "title": "Cihaz Özelliklerine Erişim",
+        "lectures": [
+          { "title": "Kamera Kullanımı", "duration": 60 },
+          { "title": "Harita Entegrasyonu", "duration": 65 },
+          { "title": "Push Bildirimleri", "duration": 50 },
+          { "title": "App Store'a Yükleme Süreci", "duration": 70 }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Python ile Veri Bilimine Giriş",
+    "description": "Veri biliminin temel taşları olan Pandas, NumPy ve Matplotlib kütüphanelerini kullanarak veri analizi, manipülasyonu ve etkileyici görselleştirme becerileri kazanın.",
+    "price": 20000,
+    "coverImage": "uploads/course-covers/coverImage-1754085172685.png",
+    "isPublished": true,
+    "sections": [
+      {
+        "title": "Python ve NumPy Temelleri",
+        "lectures": [
+          { "title": "Veri Bilimi için Python Tekrarı", "duration": 45 },
+          { "title": "NumPy Array'leri ve Operasyonlar", "duration": 60 },
+          {
+            "title": "Matematiksel ve İstatistiksel Fonksiyonlar",
+            "duration": 50
+          },
+          { "title": "Pratik NumPy Egzersizleri", "duration": 40 }
+        ]
+      },
+      {
+        "title": "Pandas ile Veri Manipülasyonu",
+        "lectures": [
+          { "title": "DataFrame ve Series Yapıları", "duration": 55 },
+          { "title": "Veri Okuma ve Yazma (CSV, Excel)", "duration": 35 },
+          { "title": "Filtreleme, Gruplama ve Birleştirme", "duration": 70 },
+          { "title": "Zaman Serileri Analizi", "duration": 60 }
+        ]
+      },
+      {
+        "title": "Matplotlib ile Veri Görselleştirme",
+        "lectures": [
+          {
+            "title": "İlk Grafik: Çizgi ve Saçılım Grafikleri",
+            "duration": 40
+          },
+          { "title": "Histogramlar ve Kutu Grafikleri", "duration": 45 },
+          { "title": "Grafikleri Özelleştirme", "duration": 50 },
+          { "title": "Gerçek Veri Seti ile Proje", "duration": 80 }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "UI/UX Temelleri: Figma ile Arayüz Tasarımı",
+    "description": "Kullanıcı merkezli tasarım prensiplerini öğrenin ve endüstri standardı olan Figma'yı kullanarak mobil ve web için etkileyici, kullanışlı ve modern arayüzler tasarlayın.",
+    "price": 35000,
+    "coverImage": "uploads/course-covers/coverImage-1754394619716.png",
+    "isPublished": true,
+    "sections": [
+      {
+        "title": "Tasarım Düşüncesine Giriş",
+        "lectures": [
+          {
+            "title": "Kullanıcı Araştırması ve Persona Oluşturma",
+            "duration": 50
+          },
+          { "title": "Problem Tanımlama", "duration": 30 },
+          { "title": "Kullanıcı Akışları ve Wireframe'ler", "duration": 60 },
+          { "title": "Tasarım Prensipleri", "duration": 40 }
+        ]
+      },
+      {
+        "title": "Figma'ya Hakim Olma",
+        "lectures": [
+          { "title": "Arayüze Genel Bakış ve Araçlar", "duration": 45 },
+          { "title": "Katmanlar, Gruplar ve Frame'ler", "duration": 55 },
+          { "title": "Auto Layout ve Constraints", "duration": 70 },
+          { "title": "Component ve Stil Kütüphaneleri", "duration": 60 }
+        ]
+      },
+      {
+        "title": "Prototipleme ve Teslim",
+        "lectures": [
+          { "title": "İnteraktif Prototip Oluşturma", "duration": 60 },
+          { "title": "Animasyonlar ve Geçişler", "duration": 50 },
+          { "title": "Kullanıcı Testleri", "duration": 40 },
+          { "title": "Geliştiricilere Teslim (Handoff)", "duration": 30 }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "İleri Seviye TypeScript ve Backend Mimarisi",
+    "description": "TypeScript'in gücünü kullanarak, sağlam, ölçeklenebilir ve bakımı kolay backend sistemleri ve microservis mimarileri tasarlayın. SOLID prensipleri ve Design Pattern'ler üzerine yoğunlaşın.",
+    "price": 45000,
+    "coverImage": "uploads/course-covers/coverImage-1754395434940.png",
+    "isPublished": true,
+    "sections": [
+      {
+        "title": "TypeScript'in Derinlikleri",
+        "lectures": [
+          { "title": "Generics ve Advanced Types", "duration": 70 },
+          { "title": "Decorators ve Metadata Reflection", "duration": 60 },
+          {
+            "title": "Module Resolution ve Declaration Merging",
+            "duration": 50
+          },
+          { "title": "Utility Types ile Pratik Çözümler", "duration": 45 }
+        ]
+      },
+      {
+        "title": "Tasarım Desenleri (Design Patterns)",
+        "lectures": [
+          { "title": "Singleton ve Factory Pattern", "duration": 50 },
+          { "title": "Adapter ve Decorator Pattern", "duration": 55 },
+          { "title": "Observer ve Strategy Pattern", "duration": 60 },
+          { "title": "Dependency Injection Prensibi", "duration": 70 }
+        ]
+      },
+      {
+        "title": "Test Odaklı Geliştirme (TDD)",
+        "lectures": [
+          { "title": "TDD Nedir? Red-Green-Refactor Döngüsü", "duration": 40 },
+          { "title": "Jest ile Unit Testler Yazma", "duration": 60 },
+          { "title": "Mocking ve Stubbing", "duration": 55 },
+          { "title": "Entegrasyon Testleri ve Supertest", "duration": 70 }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "DevOps ve CI/CD Temelleri: Docker & GitHub Actions",
+    "description": "Uygulamalarınızı Docker ile konteynerize etmeyi ve GitHub Actions kullanarak otomatik build, test ve deploy süreçleri (CI/CD pipeline) kurmayı öğrenin.",
+    "price": 50000,
+    "coverImage": "uploads/course-covers/coverImage-1754403263726.png",
+    "isPublished": true,
+    "sections": [
+      {
+        "title": "Docker'a Giriş",
+        "lectures": [
+          { "title": "Konteynerizasyon Nedir?", "duration": 30 },
+          { "title": "Dockerfile Yazma", "duration": 60 },
+          { "title": "Image ve Konteyner Yönetimi", "duration": 50 },
+          {
+            "title": "Docker Compose ile Multi-Container Uygulamalar",
+            "duration": 70
+          }
+        ]
+      },
+      {
+        "title": "GitHub Actions ile CI/CD",
+        "lectures": [
+          { "title": "Workflow, Job ve Step Kavramları", "duration": 40 },
+          { "title": "İlk Workflow'u Yazma: CI Pipeline", "duration": 60 },
+          { "title": "Secrets ve Ortam Değişkenleri Yönetimi", "duration": 45 },
+          { "title": "Otomatik Deployment (CD Pipeline)", "duration": 80 }
+        ]
+      },
+      {
+        "title": "Bulut Platformlarına Deployment",
+        "lectures": [
+          {
+            "title": "Render.com'a Node.js Uygulaması Deploy Etme",
+            "duration": 50
+          },
+          {
+            "title": "Vercel'e Next.js Uygulaması Deploy Etme",
+            "duration": 40
+          },
+          { "title": "Docker Hub ve Container Registry", "duration": 55 },
+          {
+            "title": "Sıfır Kesinti (Zero-Downtime) Deployment Stratejileri",
+            "duration": 60
+          }
+        ]
+      }
+    ]
+  }
+]

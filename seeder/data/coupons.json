@@ -1,0 +1,18 @@
+[
+  {
+    "code": "YAZ2025",
+    "discountType": "percentage",
+    "discountValue": 20,
+    "expiryDate": "2025-08-31T23:59:59.000Z",
+    "isActive": true,
+    "usageLimit": 100
+  },
+  {
+    "code": "HOSGELDIN",
+    "discountType": "fixed",
+    "discountValue": 100,
+    "expiryDate": "2026-12-31T23:59:59.000Z",
+    "isActive": true,
+    "usageLimit": 1000
+  }
+]

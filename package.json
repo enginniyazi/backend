@@ -14,7 +14,9 @@
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",
     "clean": "rm -rf dist",
-    "prebuild": "npm run clean"
+    "prebuild": "npm run clean",
+    "seed": "tsx seeder/seeder.ts",
+    "seed:destroy": "tsx seeder/seeder.ts -d"
   },
   "keywords": [],
   "author": "",

@@ -32,9 +32,13 @@ dotenv.config();
 
 // app nesnesini oluşturup testler için export ediyoruz
 export const app = express();
-
+const corsOptions = {
+  // .env dosyasından FRONTEND_URL'i oku, eğer yoksa localhost'u kullan
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  optionsSuccessStatus: 200,
+};
 // Middleware'ler
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000' }));
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Rate limiting middleware'leri - Auth endpoint'lerini hariç tut
