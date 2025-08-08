@@ -117,7 +117,7 @@
     "title": "UI/UX Temelleri: Figma ile Arayüz Tasarımı",
     "description": "Kullanıcı merkezli tasarım prensiplerini öğrenin ve endüstri standardı olan Figma'yı kullanarak mobil ve web için etkileyici, kullanışlı ve modern arayüzler tasarlayın.",
     "price": 35000,
-    "coverImage": "uploads/course-covers/coverImage-1754394619716.png",
+    "coverImage": "uploads/course-covers/coverImage-1754085172685.png",
     "isPublished": true,
     "sections": [
       {
@@ -156,7 +156,7 @@
     "title": "İleri Seviye TypeScript ve Backend Mimarisi",
     "description": "TypeScript'in gücünü kullanarak, sağlam, ölçeklenebilir ve bakımı kolay backend sistemleri ve microservis mimarileri tasarlayın. SOLID prensipleri ve Design Pattern'ler üzerine yoğunlaşın.",
     "price": 45000,
-    "coverImage": "uploads/course-covers/coverImage-1754395434940.png",
+    "coverImage": "uploads/course-covers/coverImage-1754079228979.png",
     "isPublished": true,
     "sections": [
       {
@@ -195,7 +195,7 @@
     "title": "DevOps ve CI/CD Temelleri: Docker & GitHub Actions",
     "description": "Uygulamalarınızı Docker ile konteynerize etmeyi ve GitHub Actions kullanarak otomatik build, test ve deploy süreçleri (CI/CD pipeline) kurmayı öğrenin.",
     "price": 50000,
-    "coverImage": "uploads/course-covers/coverImage-1754403263726.png",
+    "coverImage": "uploads/course-covers/coverImage-1754079186733.png",
     "isPublished": true,
     "sections": [
       {
