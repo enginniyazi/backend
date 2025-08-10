@@ -31,7 +31,7 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-prom-bundle": "^8.0.0",
-    "iyzipay": "github:iyzico/iyzipay-node",
+    "iyzipay": "^2.0.64",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.17.0",
     "multer": "^2.0.2",
