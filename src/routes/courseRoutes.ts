@@ -14,11 +14,12 @@ import {
     updateSection,
     deleteSection,
     updateLecture,
-    deleteLecture
+    deleteLecture,
+    enrollCourse
 } from '../controllers/courseController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
-import upload from '../middleware/uploadMiddleware.js';
-import { validateCourse } from '../middleware/validationMiddleware.js';
+ import upload, { handleUploadErrors, trackFileUpload } from '../middleware/uploadMiddleware.js';
+ import { validateCourse, validateEnrollment } from '../middleware/validationMiddleware.js';
 
 const router = Router();
 
@@ -136,6 +137,45 @@ router.get('/:id', getCourseById);
 
 /**
  * @swagger
+ * /api/courses/{id}/enroll:
+ *   post:
+ *     summary: Kullanıcıyı bir kursa kaydeder
+ *     tags: [Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Kurs ID
+ *     responses:
+ *       201:
+ *         description: Kursa başarıyla kayıt olundu
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Kursa başarıyla kayıt olundu"
+ *                 enrollment:
+ *                   $ref: '#/components/schemas/Enrollment'
+ *       400:
+ *         description: Geçersiz istek veya kullanıcı zaten kayıtlı
+ *       401:
+ *         description: Yetkilendirme hatası
+ *       404:
+ *         description: Kurs veya kullanıcı bulunamadı
+ *       500:
+ *         description: Sunucu hatası
+ */
+router.post('/:id/enroll', protect, validateEnrollment, enrollCourse);
+
+/**
+ * @swagger
  * /api/courses:
  *   post:
  *     summary: Yeni kurs oluştur
@@ -200,7 +240,7 @@ router.get('/:id', getCourseById);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/', protect, authorize('Instructor', 'Admin'), upload.single('coverImage'), validateCourse, createCourse);
+router.post('/', protect, authorize('Instructor', 'Admin'), upload.single('coverImage'), handleUploadErrors, trackFileUpload, validateCourse, createCourse);
 
 /**
  * @swagger
@@ -309,7 +349,7 @@ router.put('/:id/toggle-publish', protect, authorize('Instructor', 'Admin'), tog
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/:id', protect, authorize('Instructor', 'Admin'), upload.single('coverImage'), updateCourse);
+router.put('/:id', protect, authorize('Instructor', 'Admin'), upload.single('coverImage'), handleUploadErrors, trackFileUpload, updateCourse);
 
 /**
  * @swagger

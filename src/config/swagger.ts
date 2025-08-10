@@ -377,6 +377,38 @@ const options = {
              },
            },
          },
+         Enrollment: {
+           type: 'object',
+           properties: {
+             _id: {
+               type: 'string',
+               description: 'Kayıt ID',
+               example: '60d5ec49f8c7a2001c8a4d1a',
+             },
+             user: {
+               type: 'string',
+               description: 'Kullanıcı ID',
+               example: '60d5ec49f8c7a2001c8a4d1b',
+             },
+             course: {
+               type: 'string',
+               description: 'Kurs ID',
+               example: '60d5ec49f8c7a2001c8a4d1c',
+             },
+             paymentStatus: {
+               type: 'string',
+               enum: ['pending', 'completed', 'failed'],
+               description: 'Ödeme durumu',
+               example: 'completed',
+             },
+             enrolledAt: {
+               type: 'string',
+               format: 'date-time',
+               description: 'Kayıt tarihi',
+               example: '2023-10-27T10:00:00Z',
+             },
+           },
+         },
          Error: {
            type: 'object',
            properties: {
@@ -404,4 +436,4 @@ const options = {
   apis: ['./src/routes/*.ts', './src/controllers/*.ts'], // API dosyalarının yolları
 };
 
-export const specs = swaggerJsdoc(options); 
+export const specs = swaggerJsdoc(options);

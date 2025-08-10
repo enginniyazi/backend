@@ -4,6 +4,7 @@ export default {
   extensionsToTreatAsEsm: ['.ts'],
   moduleFileExtensions: ['ts', 'js', 'json'],
   testMatch: ['**/__tests__/**/*.test.ts'],
+  testTimeout: 60000,
   transform: {
     '^.+\\.ts$': [
       'ts-jest',

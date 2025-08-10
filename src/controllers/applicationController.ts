@@ -53,7 +53,7 @@ export const getAllApplications = async (req: Request, res: Response, next: Next
 export const updateApplicationStatus = async (req: Request, res: Response, next: NextFunction) => {
     const { status, notes } = req.body;
     const applicationId = req.params.id;
-    const adminId = req.user!._id;
+    const adminId = req.user!.id;
 
     try {
         // Önce geçerli bir durum değeri olduğunu kontrol et

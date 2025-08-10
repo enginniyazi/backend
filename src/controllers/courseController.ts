@@ -2,9 +2,12 @@
 
 import { Request, Response, NextFunction } from 'express';
 import Course from '../models/courseModel.js';
+import User from '../models/userModel.js';
+import Enrollment from '../models/enrollmentModel.js';
 import fs from 'fs';
 import path from 'path';
 import { HydratedCourseDocument } from '../types/courseTypes.js';
+import { HydratedUserDocument } from '../types/userTypes.js';
 
 // --- YARDIMCI FONKSİYONLAR ---
 
@@ -17,7 +20,11 @@ const checkCourseOwnership = (course: HydratedCourseDocument, req: Request) => {
     if (!course.instructor) {
         throw new Error('Kurs verisi bozuk: Eğitmen bilgisi eksik.');
     }
-    if (course.instructor.toString() !== req.user!._id.toString() && req.user!.role !== 'Admin') {
+    const instructorId = (course.instructor as any)._id
+        ? (course.instructor as any)._id.toString()
+        : course.instructor.toString();
+
+    if (instructorId !== req.user!.id.toString() && req.user!.role !== 'Admin') {
         throw new Error('Bu işlem için yetkiniz yok.');
     }
 };
@@ -35,7 +42,7 @@ export const createCourse = async (req: Request, res: Response, next: NextFuncti
         }
         const course = await Course.create({
             title, description, categories, price,
-            instructor: req.user!._id,
+            instructor: req.user!.id,
             coverImage: req.file.path,
             isPublished: false,
         });
@@ -82,7 +89,7 @@ export const updateCourse = async (req: Request, res: Response, next: NextFuncti
         Object.assign(course, req.body);
         if (req.file) {
             if (course.coverImage) {
-                fs.unlink(path.join(process.cwd(), course.coverImage), err => {
+                fs.unlink(course.coverImage, err => {
                     if (err) console.error("Eski kurs resmi silinemedi:", err);
                 });
             }
@@ -106,7 +113,7 @@ export const deleteCourse = async (req: Request, res: Response, next: NextFuncti
         }
         checkCourseOwnership(course, req);
         if (course.coverImage) {
-             fs.unlink(path.join(process.cwd(), course.coverImage), err => {
+            fs.unlink(course.coverImage, err => {
                 if (err) console.error("Kurs resmi silinemedi:", err);
             });
         }
@@ -139,7 +146,7 @@ export const togglePublishStatus = async (req: Request, res: Response, next: Nex
 // @desc    Giriş yapmış eğitmenin tüm kurslarını getirir
 export const getMyCourses = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const filter: any = { instructor: req.user!._id };
+        const filter: any = { instructor: req.user!.id };
         if (req.query.status === 'published') filter.isPublished = true;
         if (req.query.status === 'draft') filter.isPublished = false;
         const courses = await Course.find(filter).populate('categories', 'name');
@@ -151,7 +158,7 @@ export const getMyCourses = async (req: Request, res: Response, next: NextFuncti
 
 // @desc    Admin için tüm kursları getirir
 export const getAllCoursesForAdmin = async (req: Request, res: Response, next: NextFunction) => {
-     try {
+    try {
         const filter: any = {};
         if (req.query.status === 'published') filter.isPublished = true;
         if (req.query.status === 'draft') filter.isPublished = false;
@@ -294,6 +301,60 @@ export const deleteLecture = async (req: Request, res: Response, next: NextFunct
         section.lectures = section.lectures.filter(lec => (lec as any)._id.toString() !== lectureId);
         await course.save();
         res.status(200).json({ message: 'Ders başarıyla silindi.' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Kullanıcıyı kursa kaydeder
+// @route   POST /api/courses/:id/enroll
+// @access  Private
+export const enrollCourse = async (req: Request, res: Response, next: NextFunction) => {
+    const courseId = req.params.id;
+    const userId = (req.user as HydratedUserDocument)._id;
+
+    try {
+        const course = await Course.findById(courseId);
+        if (!course) {
+            res.status(404);
+            throw new Error('Kurs bulunamadı.');
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            res.status(404);
+            throw new Error('Kullanıcı bulunamadı.');
+        }
+
+        // Kullanıcının zaten kayıtlı olup olmadığını kontrol et
+        const alreadyEnrolled = await Enrollment.findOne({ user: userId, course: courseId });
+        if (alreadyEnrolled) {
+            res.status(400);
+            throw new Error('Kullanıcı zaten bu kursa kayıtlı.');
+        }
+
+        // Yeni kayıt oluştur
+        const enrollment = await Enrollment.create({
+            user: userId,
+            course: courseId,
+            paymentStatus: 'completed', // Ödemenin bu adımdan önce yapıldığı varsayılıyor
+            paymentAmount: course.price,
+            paymentMethod: 'credit_card', // Varsayılan ödeme yöntemi
+            paymentDate: new Date(),
+        });
+
+        // Kursu kullanıcının kayıtlı kurslarına ekle
+        user.enrolledCourses.push(course._id as any);
+        await user.save();
+
+        // Kurs enrollment sayısını artır
+        course.enrollmentCount += 1;
+        await course.save();
+
+        res.status(201).json({
+            message: 'Kursa başarıyla kayıt olundu',
+            enrollment,
+        });
     } catch (error) {
         next(error);
     }

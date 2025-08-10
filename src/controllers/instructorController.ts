@@ -8,7 +8,7 @@ import User from '../models/userModel.js';
 // @desc    Bir kullanıcı eğitmen olmak için başvurur
 export const applyToBeInstructor = async (req: Request, res: Response, next: NextFunction) => {
   const { bio, expertise } = req.body;
-  const userId = req.user!._id;
+  const userId = req.user!.id;
 
   try {
     const existingApplication = await InstructorApplication.findOne({ user: userId });
@@ -83,7 +83,7 @@ export const reviewApplication = async (req: Request, res: Response, next: NextF
 
 // @desc    Kullanıcı kendi başvurusunu görüntüler
 export const getMyApplication = async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user!._id;
+    const userId = req.user!.id;
     
     try {
         const application = await InstructorApplication.findOne({ user: userId });
@@ -110,7 +110,7 @@ export const getAllInstructorProfiles = async (req: Request, res: Response, next
 // @desc    Bir eğitmen kendi profilini günceller
 export const updateMyProfile = async (req: Request, res: Response, next: NextFunction) => {
     const { bio, expertise, website, socials } = req.body;
-    const userId = req.user!._id;
+    const userId = req.user!.id;
 
     try {
         const profile = await InstructorProfile.findOneAndUpdate(

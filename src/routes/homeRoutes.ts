@@ -3,6 +3,28 @@ import express from 'express';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Home
+ *   description: Ana sayfa ve genel bilgiler
+ */
+
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Ana sayfa HTML içeriğini gösterir
+ *     tags: [Home]
+ *     responses:
+ *       200:
+ *         description: Ana sayfa HTML içeriği
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ */
+
 router.get('/', (req, res) => {
   const html = `
     <!DOCTYPE html>
@@ -214,4 +236,4 @@ router.get('/', (req, res) => {
   res.send(html);
 });
 
-export default router; 
+export default router;

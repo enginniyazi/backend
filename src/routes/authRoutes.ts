@@ -2,7 +2,7 @@
 
 import { Router } from 'express';
 import { registerUser, loginUser, updateUserAvatar, updateUserProfile, getAllUsers, getUserById, updateUserById, deleteUserById } from '../controllers/authController.js';
-import upload from '../middleware/uploadMiddleware.js';
+import upload, { handleUploadErrors, trackFileUpload } from '../middleware/uploadMiddleware.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 import { validateRegistration, validateLogin } from '../middleware/validationMiddleware.js';
 
@@ -165,7 +165,7 @@ router.post('/login', validateLogin, loginUser);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.put('/profile/avatar', protect, upload.single('avatar'), updateUserAvatar);
+router.put('/profile/avatar', protect, upload.single('avatar'), handleUploadErrors, trackFileUpload, updateUserAvatar);
 
 /**
  * @swagger

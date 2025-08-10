@@ -122,3 +122,26 @@ export const validateCourse = (req: Request, res: Response, next: NextFunction) 
 
     next();
 };
+
+// Course enrollment validation
+export const validateEnrollment = (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params; // Assuming 'id' is a course ID from params
+
+    const errors: string[] = [];
+
+    // A simple check for MongoDB ID format. 
+    // For a more robust check, consider using a library like 'mongoose.Types.ObjectId.isValid(id)'
+    // or a dedicated validation library.
+    if (!id || typeof id !== 'string' || !id.match(/^[0-9a-fA-F]{24}$/)) {
+        errors.push('Geçersiz kurs ID\'si.');
+    }
+
+    if (errors.length > 0) {
+        return res.status(400).json({
+            message: 'Validation hatası',
+            errors,
+        });
+    }
+
+    next();
+};

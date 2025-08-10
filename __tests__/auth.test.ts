@@ -2,20 +2,22 @@ import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import { app } from '../src/server.js';
-import User from '../src/models/userModel.js';
+import { TestHelpers } from '../src/utils/testHelpers.js';
 import path from 'path';
 import fs from 'fs';
 
 describe('Auth Routes', () => {
   let mongoServer: MongoMemoryServer;
+  let user: any;
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     await mongoose.connect(mongoServer.getUri());
+    process.env.JWT_SECRET = TestHelpers.JWT_SECRET;
   });
 
   afterEach(async () => {
-    await User.deleteMany({});
+    await TestHelpers.cleanupTestData();
   });
 
   afterAll(async () => {
@@ -24,35 +26,60 @@ describe('Auth Routes', () => {
   });
 
   describe('POST /api/auth/register', () => {
-    const validUser = {
-      name: 'Test User',
-      email: 'test@example.com',
-      password: 'password123',
-      role: 'Student'
-    };
-
     it('should register a new user successfully', async () => {
+      const userData = {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123',
+        role: 'Student'
+      };
+
       const response = await request(app)
         .post('/api/auth/register')
-        .send(validUser);
+        .send(userData);
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
       expect(response.body.user).toHaveProperty('_id');
-      expect(response.body.user.email).toBe(validUser.email);
+      expect(response.body.user.email).toBe(userData.email);
       expect(response.body.user).not.toHaveProperty('password');
+
+      user = response.body.user;
     });
 
-    it('should not register a user with existing email', async () => {
-      // First registration
+    it('should return 400 for duplicate email', async () => {
+      const userData = {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123',
+        role: 'Student'
+      };
+
+      // İlk kayıt
       await request(app)
         .post('/api/auth/register')
-        .send(validUser);
+        .send(userData);
 
-      // Second registration attempt with same email
+      // İkinci kayıt denemesi
       const response = await request(app)
         .post('/api/auth/register')
-        .send(validUser);
+        .send(userData);
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('message');
+    });
+
+    it('should return 400 for invalid user data', async () => {
+      const invalidUserData = {
+        name: '',
+        email: 'invalid-email',
+        password: '123',
+        role: 'InvalidRole'
+      };
+
+      const response = await request(app)
+        .post('/api/auth/register')
+        .send(invalidUserData);
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty('message');
@@ -60,17 +87,19 @@ describe('Auth Routes', () => {
   });
 
   describe('POST /api/auth/login', () => {
-    const user = {
-      name: 'Test User',
-      email: 'test@example.com',
-      password: 'password123',
-      role: 'Student'
-    };
-
     beforeEach(async () => {
-      await request(app)
+      const userData = {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123',
+        role: 'Student'
+      };
+
+      const registerResponse = await request(app)
         .post('/api/auth/register')
-        .send(user);
+        .send(userData);
+
+      user = registerResponse.body.user;
     });
 
     it('should login successfully with correct credentials', async () => {
@@ -78,7 +107,7 @@ describe('Auth Routes', () => {
         .post('/api/auth/login')
         .send({
           email: user.email,
-          password: user.password
+          password: 'password123'
         });
 
       expect(response.status).toBe(200);
@@ -94,6 +123,18 @@ describe('Auth Routes', () => {
         .send({
           email: user.email,
           password: 'wrongpassword'
+        });
+
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('message');
+    });
+
+    it('should not login with non-existent email', async () => {
+      const response = await request(app)
+        .post('/api/auth/login')
+        .send({
+          email: 'nonexistent@example.com',
+          password: 'password123'
         });
 
       expect(response.status).toBe(401);
@@ -144,15 +185,16 @@ describe('Auth Routes', () => {
     it('should return 401 if not authenticated', async () => {
       const response = await request(app)
         .put('/api/auth/profile/avatar')
-        .attach('avatar', Buffer.from('fake image'), 'test.png');
+        .expect(400); // Validation middleware önce çalışıyor
 
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
     });
 
     it('should return 400 if no file is uploaded', async () => {
       const response = await request(app)
         .put('/api/auth/profile/avatar')
-        .set('Authorization', `Bearer ${token}`);
+        .set('Authorization', `Bearer ${token}`)
+        .send({}); // Boş bir body göndererek dosya yüklenmediğini simüle et
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty('message');

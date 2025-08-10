@@ -96,16 +96,21 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 // @route   PUT /api/users/profile/avatar
 export const updateUserAvatar = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await User.findById(req.user!._id);
-
-    if (!user) {
-      res.status(404);
-      throw new Error('Kullanıcı bulunamadı.');
+    if (!req.user || !req.user.id) {
+      res.status(401);
+      throw new Error('Kimlik doğrulaması yapılmadı.');
     }
 
     if (!req.file) {
       res.status(400);
       throw new Error('Lütfen bir resim dosyası yükleyin.');
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      res.status(404);
+      throw new Error('Kullanıcı bulunamadı.');
     }
 
     // --- TODO ÇÖZÜLDÜ: ESKİ AVATARI SİLME MANTIĞI ---
@@ -148,7 +153,7 @@ export const updateUserAvatar = async (req: Request, res: Response, next: NextFu
 // @route   PUT /api/auth/profile
 export const updateUserProfile = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await User.findById(req.user!._id);
+        const user = await User.findById(req.user!.id);
 
         if (!user) {
             res.status(404);

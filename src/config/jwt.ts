@@ -2,7 +2,13 @@
 import jwt from 'jsonwebtoken';
 
 export const JWT_CONFIG = {
-    secret: process.env.JWT_SECRET || 'test-secret',
+    get secret() {
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            throw new Error('JWT_SECRET ortam değişkeni tanımlanmamış. Lütfen .env dosyasını kontrol edin.');
+        }
+        return secret;
+    },
     expiresIn: process.env.JWT_EXPIRES_IN || '30d',
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
 };
@@ -25,4 +31,4 @@ export const verifyToken = (token: string): any => {
     } catch (error) {
         throw new Error('Geçersiz token');
     }
-}; 
+};
