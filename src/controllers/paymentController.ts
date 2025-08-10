@@ -209,7 +209,7 @@ const confirmPayment = asyncHandler(async (req: UserRequest, res: Response, next
       // Kursu kullanıcının kayıtlı kurslarına ekle
       const user = await User.findById(req.user._id);
       if (user) {
-        user.enrolledCourses.push(course._id);
+        user.enrolledCourses.push(course._id as any);
         await user.save();
       }
 
@@ -282,7 +282,7 @@ const confirmPayment = asyncHandler(async (req: UserRequest, res: Response, next
         // Kursu kullanıcının kayıtlı kurslarına ekle
         const user = await User.findById(req.user._id);
         if (user) {
-          user.enrolledCourses.push(course._id);
+          user.enrolledCourses.push(course._id as any);
           await user.save();
         }
 
