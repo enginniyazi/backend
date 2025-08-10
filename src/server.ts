@@ -96,8 +96,8 @@ app.use(errorHandler);
 // Veritabanı metriklerini izleme
 import { setupDbMetrics } from './middleware/dbMetricsMiddleware.js';
 
-const PORT = process.env.PORT || 5001;
-
+const PORT:number = parseInt(process.env.PORT || '5001', 10)
+const HOST = '0.0.0.0';
 const start = async () => {
   try {
     // Veritabanı bağlantısı
@@ -107,7 +107,7 @@ const start = async () => {
     setupDbMetrics();
 
     // Sunucuyu başlat
-    app.listen(PORT, () => {
+    app.listen(PORT, HOST,() => {
       console.log(`Sunucu, http://localhost:${PORT} adresinde dinleniyor.`);
       console.log(`Metrikler: http://localhost:${PORT}/metrics`);
     });
