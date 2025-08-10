@@ -17,6 +17,8 @@
     "__tests__/**/*"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/*.test.ts", // Tüm .test.ts dosyalarını hariç tut
+    "__tests__"     // Veya tüm __tests__ klasörünü hariç tut
   ]
 }
