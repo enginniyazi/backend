@@ -1,35 +1,27 @@
 # 1. Adım: Derleme ortamını kur
-FROM node:20.19.0
+FROM node:20-alpine AS builder
 
-# Uygulama dizinini oluştur
 WORKDIR /usr/src/app
-
-# Bağımlılıkları kopyala ve yükle (bu katman cache'lenir)
 COPY package*.json ./
+# Git gerektiren bağımlılıklar için Git'i kur
+RUN apk add --no-cache git
 RUN npm install
 
-# Tüm proje dosyalarını kopyala
 COPY . .
 
-# Eğer TypeScript gibi bir derleme adımınız varsa (opsiyonel)
-# RUN npm run build
-
-# 2. Adım: Üretim (production) ortamını kur
-FROM node:20.19.0
+FROM node:20-alpine
 
 WORKDIR /usr/src/app
-
-# Sadece gerekli bağımlılıkları yükle
 COPY package*.json ./
+RUN apk add --no-cache git
 RUN npm ci --only=production
 
-# Derlenmiş dosyaları ve diğer gerekli dosyaları kopyala
-COPY . .
-# Eğer bir 'build' adımınız varsa, aşağıdaki satırı kullanın:
-# COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app .
 
-# Uygulamayı çalıştıracak portu belirt
 EXPOSE 3000
+CMD [ "node", "server.js" ] 
 
-# Uygulamayı başlat
-CMD [ "node", "server.js" ]
+git add Dockerfile
+git commit -m "feat: Add git to Dockerfile for npm dependencies"
+
+caprover deploy --default
