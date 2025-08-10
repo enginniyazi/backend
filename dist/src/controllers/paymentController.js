@@ -1,16 +1,31 @@
 // src/controllers/paymentController.ts
 import asyncHandler from '../middleware/asyncHandler.js';
 import Iyzipay from 'iyzipay';
+import { logger } from '../utils/logger.js';
+// İyzipay yapılandırması
 const iyzipay = new Iyzipay({
     uri: process.env.IYZICO_API_BASE_URL,
     apiKey: process.env.IYZICO_API_KEY,
     secretKey: process.env.IYZICO_SECRET_KEY,
 });
-// @desc    Create payment intent
-// @route   POST /api/payment/create-intent
+// İyzipay callback'lerini Promise'e çeviren helper fonksiyon
+const promisifyIyzipay = (iyzipayMethod, request) => {
+    return new Promise((resolve, reject) => {
+        iyzipayMethod(request, (err, result) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(result);
+            }
+        });
+    });
+};
+// @desc    Create payment form
+// @route   POST /api/payment/create-payment-form
 // @access  Private
-const createPaymentIntent = asyncHandler(async (req, res, next) => {
-    const { amount } = req.body;
+const createPaymentForm = asyncHandler(async (req, res, next) => {
+    const { amount, courseId } = req.body;
     if (!amount) {
         res.status(400);
         throw new Error('Amount is required');
@@ -19,27 +34,31 @@ const createPaymentIntent = asyncHandler(async (req, res, next) => {
         res.status(400);
         throw new Error('Amount must be a positive number');
     }
+    if (!req.user) {
+        res.status(401);
+        throw new Error('User not authenticated');
+    }
     try {
-        const conversationId = Math.floor(Math.random() * 100000000).toString();
+        const conversationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const request = {
             locale: Iyzipay.LOCALE.TR,
             conversationId: conversationId,
             price: amount.toFixed(2),
             paidPrice: amount.toFixed(2),
             currency: Iyzipay.CURRENCY.TRY,
-            basketId: 'B67832',
+            basketId: `basket_${courseId || 'default'}`,
             paymentGroup: Iyzipay.PAYMENT_GROUP.PRODUCT,
             paymentChannel: Iyzipay.PAYMENT_CHANNEL.WEB,
             enabledInstallments: [1],
             buyer: {
-                id: req.user?.id || 'unknown',
-                name: req.user?.name || 'unknown',
-                surname: req.user?.name || 'unknown',
-                gsmNumber: '+905350000000',
-                email: req.user?.email || 'unknown@example.com',
-                identityNumber: '74300864791',
-                lastLoginDate: '2023-08-05 12:43:34',
-                registrationDate: '2023-08-05 12:43:34',
+                id: req.user._id.toString(),
+                name: req.user.name,
+                surname: req.user.name.split(' ')[1] || req.user.name,
+                gsmNumber: '+905350000000', // Kullanıcıdan alınabilir
+                email: req.user.email,
+                identityNumber: '74300864791', // Kullanıcıdan alınabilir
+                lastLoginDate: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                registrationDate: new Date().toISOString().slice(0, 19).replace('T', ' '),
                 registrationAddress: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
                 ip: req.ip || '127.0.0.1',
                 city: 'Istanbul',
@@ -47,14 +66,14 @@ const createPaymentIntent = asyncHandler(async (req, res, next) => {
                 zipCode: '34732',
             },
             shippingAddress: {
-                contactName: 'Jane Doe',
+                contactName: req.user.name,
                 city: 'Istanbul',
                 country: 'Turkey',
                 address: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
                 zipCode: '34732',
             },
             billingAddress: {
-                contactName: 'Jane Doe',
+                contactName: req.user.name,
                 city: 'Istanbul',
                 country: 'Turkey',
                 address: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
@@ -72,64 +91,118 @@ const createPaymentIntent = asyncHandler(async (req, res, next) => {
             },
             basketItems: [
                 {
-                    id: 'BI101',
-                    name: 'Test Course',
+                    id: courseId || 'course_default',
+                    name: 'Online Course',
                     category1: 'Education',
                     itemType: Iyzipay.BASKET_ITEM_TYPE.VIRTUAL,
                     price: amount.toFixed(2).toString(),
                 },
             ],
         };
-        iyzipay.checkoutFormInitialize.create(request, (err, result) => {
-            if (err) {
-                console.log('Iyzipay Error:', err);
-                return next(new Error(`Error creating payment form: ${err.errorMessage}`));
-            }
-            console.log('Iyzipay Result:', result);
-            res.status(201).json({ paymentForm: result.checkoutFormContent });
+        logger.info('Creating İyzipay payment form', {
+            userId: req.user._id,
+            amount,
+            conversationId
+        }, req);
+        const result = await promisifyIyzipay(iyzipay.checkoutFormInitialize.create, request);
+        logger.info('İyzipay payment form created successfully', {
+            conversationId: result.conversationId,
+            token: result.token
+        }, req);
+        res.status(201).json({
+            paymentForm: result.checkoutFormContent,
+            token: result.token,
+            conversationId: result.conversationId
         });
     }
     catch (error) {
+        logger.error('İyzipay payment form creation failed', {
+            error: error.message,
+            userId: req.user._id
+        }, req);
         res.status(500);
-        throw new Error(`Error creating payment intent: ${error.message}`);
+        throw new Error(`Payment form creation failed: ${error.errorMessage || error.message}`);
     }
 });
 // @desc    Confirm payment
-// @route   POST /api/payment/confirm
+// @route   POST /api/payment/confirm-payment
 // @access  Private
 const confirmPayment = asyncHandler(async (req, res, next) => {
-    const { paymentToken } = req.body;
-    if (!paymentToken) {
+    const { token, courseId } = req.body;
+    if (!token) {
         res.status(400);
-        throw new Error('Payment Token is required');
+        throw new Error('Payment token is required');
     }
-    // Simulate successful payment for testing environment
+    if (!req.user) {
+        res.status(401);
+        throw new Error('User not authenticated');
+    }
+    // Test ortamında simüle et
     if (process.env.NODE_ENV === 'test') {
+        logger.info('Test environment: Simulating successful payment', {
+            userId: req.user._id,
+            token
+        }, req);
         return res.status(200).json({
-            message: 'Payment confirmed successfully',
+            message: 'Payment confirmed and enrollment successful',
             paymentStatus: 'SUCCESS',
             conversationId: 'test_conversation_id',
+            enrollment: {
+                user: req.user._id,
+                course: courseId,
+                paymentStatus: 'completed',
+                paymentAmount: 99.99,
+                paymentMethod: 'test',
+                paymentDate: new Date()
+            }
         });
     }
-    const request = {
-        locale: Iyzipay.LOCALE.TR,
-        conversationId: Math.floor(Math.random() * 100000000).toString(),
-        token: paymentToken,
-    };
-    iyzipay.checkoutForm.retrieve(request, (err, result) => {
-        if (err) {
-            return next(new Error(`Error retrieving payment: ${err.errorMessage}`));
-        }
+    try {
+        const request = {
+            locale: Iyzipay.LOCALE.TR,
+            conversationId: `confirm_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            token: token,
+        };
+        logger.info('Confirming İyzipay payment', {
+            userId: req.user._id,
+            token
+        }, req);
+        const result = await promisifyIyzipay(iyzipay.checkoutForm.retrieve, request);
+        logger.info('İyzipay payment confirmation result', {
+            status: result.paymentStatus,
+            conversationId: result.conversationId
+        }, req);
         if (result.paymentStatus === 'SUCCESS') {
             res.status(200).json({
-                message: 'Payment confirmed successfully',
+                message: 'Payment confirmed and enrollment successful',
                 paymentStatus: result.paymentStatus,
                 conversationId: result.conversationId,
+                enrollment: {
+                    user: req.user._id,
+                    course: courseId,
+                    paymentStatus: 'completed',
+                    paymentAmount: parseFloat(result.price),
+                    paymentMethod: 'iyzipay',
+                    paymentDate: new Date()
+                }
             });
         }
         else {
-            return next(new Error(`Payment failed: ${result.errorMessage}`));
+            logger.warn('İyzipay payment failed', {
+                status: result.paymentStatus,
+                errorMessage: result.errorMessage
+            }, req);
+            res.status(400);
+            throw new Error(`Payment failed: ${result.errorMessage || 'Unknown error'}`);
         }
-    });
+    }
+    catch (error) {
+        logger.error('İyzipay payment confirmation failed', {
+            error: error.message,
+            userId: req.user._id
+        }, req);
+        res.status(500);
+        throw new Error(`Payment confirmation failed: ${error.errorMessage || error.message}`);
+    }
 });
-export { createPaymentIntent, confirmPayment };
+export { createPaymentForm, confirmPayment };

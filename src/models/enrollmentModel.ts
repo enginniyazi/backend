@@ -48,7 +48,7 @@ const EnrollmentSchema = new Schema<IEnrollment>({
   paymentMethod: {
     type: String,
     required: true,
-    enum: ['credit_card', 'bank_transfer', 'crypto', 'coupon'],
+    enum: ['credit_card', 'bank_transfer', 'crypto', 'coupon', 'test', 'iyzipay'],
   },
   paymentDate: {
     type: Date,

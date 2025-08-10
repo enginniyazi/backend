@@ -1,7 +1,7 @@
 // src/routes/paymentRoutes.ts
 
 import { Router } from 'express';
-import { createPaymentIntent, confirmPayment } from '../controllers/paymentController.js';
+import { createPaymentForm, confirmPayment } from '../controllers/paymentController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = Router();
@@ -15,9 +15,9 @@ const router = Router();
 
 /**
  * @swagger
- * /api/payment/create-intent:
+ * /api/payment/create-payment-form:
  *   post:
- *     summary: Yeni bir ödeme niyeti oluşturur
+ *     summary: İyzipay ödeme formu oluşturur
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
@@ -34,17 +34,27 @@ const router = Router();
  *                 type: number
  *                 description: Ödeme tutarı (örneğin, 100.00 TL için 100)
  *                 example: 99.99
+ *               courseId:
+ *                 type: string
+ *                 description: Kurs ID'si
+ *                 example: "507f1f77bcf86cd799439011"
  *     responses:
  *       201:
- *         description: Ödeme niyeti başarıyla oluşturuldu
+ *         description: Ödeme formu başarıyla oluşturuldu
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 clientSecret:
+ *                 paymentForm:
  *                   type: string
- *                   description: Stripe Client Secret
+ *                   description: İyzipay ödeme formu HTML içeriği
+ *                 token:
+ *                   type: string
+ *                   description: Ödeme token'ı
+ *                 conversationId:
+ *                   type: string
+ *                   description: Konuşma ID'si
  *       400:
  *         description: Geçersiz istek
  *       401:
@@ -52,13 +62,13 @@ const router = Router();
  *       500:
  *         description: Sunucu hatası
  */
-router.post('/create-intent', protect, createPaymentIntent);
+router.post('/create-payment-form', protect, createPaymentForm);
 
 /**
  * @swagger
- * /api/payment/confirm:
+ * /api/payment/confirm-payment:
  *   post:
- *     summary: Bir ödeme niyetini onaylar
+ *     summary: İyzipay ödemesini onaylar
  *     tags: [Payments]
  *     security:
  *       - bearerAuth: []
@@ -69,12 +79,16 @@ router.post('/create-intent', protect, createPaymentIntent);
  *           schema:
  *             type: object
  *             required:
- *               - paymentIntentId
+ *               - token
  *             properties:
- *               paymentIntentId:
+ *               token:
  *                 type: string
- *                 description: Onaylanacak ödeme niyetinin ID'si
- *                 example: "pi_3NqZ1a2e3f4g5h6i7j8k9l0m"
+ *                 description: İyzipay ödeme token'ı
+ *                 example: "token_123456789"
+ *               courseId:
+ *                 type: string
+ *                 description: Kurs ID'si
+ *                 example: "507f1f77bcf86cd799439011"
  *     responses:
  *       200:
  *         description: Ödeme başarıyla onaylandı
@@ -85,10 +99,28 @@ router.post('/create-intent', protect, createPaymentIntent);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Payment confirmed successfully"
- *                 paymentIntentStatus:
+ *                   example: "Payment confirmed and enrollment successful"
+ *                 paymentStatus:
  *                   type: string
- *                   example: "succeeded"
+ *                   example: "SUCCESS"
+ *                 conversationId:
+ *                   type: string
+ *                   example: "conv_123456789"
+ *                 enrollment:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: string
+ *                     course:
+ *                       type: string
+ *                     paymentStatus:
+ *                       type: string
+ *                     paymentAmount:
+ *                       type: number
+ *                     paymentMethod:
+ *                       type: string
+ *                     paymentDate:
+ *                       type: string
  *       400:
  *         description: Geçersiz istek
  *       401:
@@ -96,6 +128,6 @@ router.post('/create-intent', protect, createPaymentIntent);
  *       500:
  *         description: Sunucu hatası
  */
-router.post('/confirm', protect, confirmPayment);
+router.post('/confirm-payment', protect, confirmPayment);
 
 export default router;
