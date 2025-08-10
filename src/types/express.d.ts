@@ -1,22 +1,17 @@
 // src/types/express.d.ts
 
 import { Request } from 'express';
-
-interface UserPayload {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
+import { HydratedUserDocument } from './userTypes.js';
 
 declare module 'express-serve-static-core' {
   interface Request {
-    user?: UserPayload;
+    user?: HydratedUserDocument;
   }
 }
 
 declare module 'iyzipay';
 
 export interface UserRequest extends Request {
-  user?: UserPayload;
+  user?: HydratedUserDocument;
 }
+

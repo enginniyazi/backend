@@ -31,7 +31,7 @@ export const metricsMiddleware = metricsEnabled ? promBundle({
   includeStatusCode: true,
   includeUp: true,
   customLabels: { app: 'yowa-backend' },
-  promClient: { collectDefaultMetrics: false }, // Yukarıda manuel olarak yapılandırdık
+  promClient: { collectDefaultMetrics: false as any }, // Yukarıda manuel olarak yapılandırdık
   metricsPath: '/metrics',
   formatStatusCode: (res: Response) => res.statusCode.toString(),
   normalizePath: [
@@ -45,13 +45,7 @@ export const metricsMiddleware = metricsEnabled ? promBundle({
   ],
   // Bazı endpoint'leri metriklerden hariç tut
   autoregister: true,
-  promRegistry: register,
-  exclude: [
-    '/api/health',
-    '/api/health/detailed',
-    '/metrics',
-    '/api-docs'
-  ]
+  promRegistry: register
 }) : (req: Request, res: Response, next: Function) => next(); // Metrikler devre dışıysa boş middleware
 
 // Özel metrikler için register'ı dışa aktar
@@ -66,7 +60,7 @@ export const customMetrics = metricsEnabled ? {
     labelNames: ['operation', 'model'],
     registers: [register]
   }),
-  
+
   // Dosya yükleme sayacı
   fileUploads: new promClient.Counter({
     name: 'yowa_file_uploads_total',
@@ -74,14 +68,14 @@ export const customMetrics = metricsEnabled ? {
     labelNames: ['type'],
     registers: [register]
   }),
-  
+
   // Aktif kullanıcı sayacı
   activeUsers: new promClient.Gauge({
     name: 'yowa_active_users',
     help: 'Aktif kullanıcı sayısı',
     registers: [register]
   }),
-  
+
   // Oturum süresi histogramı
   sessionDuration: new promClient.Histogram({
     name: 'yowa_session_duration_seconds',
@@ -89,7 +83,7 @@ export const customMetrics = metricsEnabled ? {
     buckets: [60, 300, 600, 1800, 3600, 7200],
     registers: [register]
   }),
-  
+
   // API yanıt süresi histogramı
   apiResponseTime: new promClient.Histogram({
     name: 'yowa_api_response_time_seconds',
@@ -100,11 +94,11 @@ export const customMetrics = metricsEnabled ? {
   })
 } : {
   // Metrikler devre dışıysa, boş nesneler döndür
-  dbOperations: { labels: () => ({ inc: () => {} }) },
-  fileUploads: { labels: () => ({ inc: () => {} }) },
-  activeUsers: { inc: () => {}, dec: () => {}, set: () => {} },
-  sessionDuration: { observe: () => {} },
-  apiResponseTime: { labels: () => ({ observe: () => {} }) }
+  dbOperations: { labels: () => ({ inc: () => { } }) },
+  fileUploads: { labels: () => ({ inc: () => { } }) },
+  activeUsers: { inc: () => { }, dec: () => { }, set: () => { } },
+  sessionDuration: { observe: () => { } },
+  apiResponseTime: { labels: () => ({ observe: () => { } }) }
 };
 
 // Özel metrik middleware'i
@@ -112,19 +106,19 @@ export const trackApiResponseTime = (req: Request, res: Response, next: Function
   if (!metricsEnabled) {
     return next();
   }
-  
+
   const start = process.hrtime();
-  
+
   // Response tamamlandığında süreyi ölç
   res.on('finish', () => {
     const diff = process.hrtime(start);
     const time = diff[0] + diff[1] / 1e9; // Saniye cinsinden
-    
+
     // URL'deki ID'leri parametreleştir
     let route = req.originalUrl;
     const idPattern = /\/[a-f0-9]{24}(?:\/|$)/g;
     route = route.replace(idPattern, '/:id/');
-    
+
     // Metriği kaydet
     customMetrics.apiResponseTime.labels(
       req.method,
@@ -132,6 +126,6 @@ export const trackApiResponseTime = (req: Request, res: Response, next: Function
       res.statusCode.toString()
     ).observe(time);
   });
-  
+
   next();
 };

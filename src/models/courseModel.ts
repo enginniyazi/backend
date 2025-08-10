@@ -59,7 +59,7 @@ const CourseSchema = new Schema<ICourse>({
 }, { timestamps: true });
 
 // Virtual field for discounted price
-CourseSchema.virtual('discountedPrice').get(function () {
+CourseSchema.virtual('discountedPrice').get(function (this: any) {
   if (this.discountPercentage > 0 && this.discountEndDate > new Date()) {
     return this.price * (1 - this.discountPercentage / 100);
   }
@@ -67,15 +67,15 @@ CourseSchema.virtual('discountedPrice').get(function () {
 });
 
 // Pre-save hook to calculate totals
-CourseSchema.pre('save', function (next) {
+CourseSchema.pre('save', function (this: any, next) {
   if (this.sections && this.sections.length > 0) {
-    this.totalDuration = this.sections.reduce((total, section) => {
-      return total + section.lectures.reduce((sectionTotal, lecture) => {
+    this.totalDuration = this.sections.reduce((total: number, section: any) => {
+      return total + section.lectures.reduce((sectionTotal: number, lecture: any) => {
         return sectionTotal + (lecture.duration || 0);
       }, 0);
     }, 0);
 
-    this.totalLectures = this.sections.reduce((total, section) => {
+    this.totalLectures = this.sections.reduce((total: number, section: any) => {
       return total + section.lectures.length;
     }, 0);
   }
