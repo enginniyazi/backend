@@ -240,5 +240,3 @@ Bu proje ISC lisansı altında lisanslanmıştır.
 ## 🆘 Destek
 
 Herhangi bir sorun yaşarsanız, lütfen issue oluşturun veya iletişime geçin.
-
-Engin Niyazi Ergül
