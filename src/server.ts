@@ -43,7 +43,7 @@ app.use(trackApiResponseTime);
 
 // Middleware'ler
 // CORS yapılandırması
-const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'];
+const allowedOrigins: string[] = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'];
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -96,18 +96,18 @@ app.use(errorHandler);
 // Veritabanı metriklerini izleme
 import { setupDbMetrics } from './middleware/dbMetricsMiddleware.js';
 
-const PORT:number = parseInt(process.env.PORT || '5001', 10)
+const PORT: number = parseInt(process.env.PORT || '5001', 10)
 const HOST = '0.0.0.0';
 const start = async () => {
   try {
     // Veritabanı bağlantısı
     await connectDB();
-    
+
     // Veritabanı metriklerini etkinleştir
     setupDbMetrics();
 
     // Sunucuyu başlat
-    app.listen(PORT, HOST,() => {
+    app.listen(PORT, HOST, () => {
       console.log(`Sunucu, http://localhost:${PORT} adresinde dinleniyor.`);
       console.log(`Metrikler: http://localhost:${PORT}/metrics`);
     });
