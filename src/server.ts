@@ -97,7 +97,7 @@ app.use(errorHandler);
 import { setupDbMetrics } from './middleware/dbMetricsMiddleware.js';
 
 const PORT: number = parseInt(process.env.PORT || '5001', 10)
-const HOST = '0.0.0.0';
+const HOST = process.env.HOST || '0.0.0.0';
 const start = async () => {
   try {
     // Veritabanı bağlantısı
