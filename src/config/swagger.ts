@@ -23,7 +23,7 @@ const options = {
         description: 'Development server',
       },
       {
-        url: 'http://yowa-backend.116.203.84.42.nip.io/',
+        url: 'http://backendapi.yowaacademy.com/',
         description: 'Production server',
       },
     ],
