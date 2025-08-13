@@ -23,7 +23,7 @@ const options = {
         description: 'Development server',
       },
       {
-        url: 'https://backendapi.yowaacademy.com/',
+        url: 'https://backendapi.yowaacademy.com',
         description: 'Production server',
       },
     ],
