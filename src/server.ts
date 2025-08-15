@@ -1,5 +1,6 @@
 // src/server.ts
 
+import { fileURLToPath } from 'url';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -48,6 +49,16 @@ const allowedOrigins: string[] = process.env.ALLOWED_ORIGINS ? process.env.ALLOW
 app.use(cors({
   origin: (origin, callback) => {
     // origin olmadığında (örn. Postman gibi araçlar) veya izin verilen bir origin olduğunda
+    // === OTOPSİ BAŞLANGICI ===
+    // console.log("===================================");
+    // console.log("GELEN İSTEĞİN ORIGIN'İ:", origin);
+    // console.log("İZİN VERİLEN ORIGIN LİSTESİ:", allowedOrigins);
+    // console.log("İLK İZİNLİ ORIGIN:", allowedOrigins[0]);
+    // console.log("TİPLER EŞLEŞİYOR MU?:", typeof origin, typeof allowedOrigins[0]);
+    // console.log("DEĞERLER EŞLEŞİYOR MU?:", origin === allowedOrigins[0]);
+    // console.log("LİSTE İÇERİYOR MU?:", allowedOrigins.includes(origin || ""));
+    // console.log("===================================");
+    // === OTOPSİ SONU ===
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -64,9 +75,11 @@ app.use(express.json());
 app.use(generalRateLimit); // Genel rate limiting
 
 // Statik dosya servisi
-const __dirname = path.resolve(path.dirname(''));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+const staticUrl = path.join(__dirname, '..', 'uploads');
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 // Ana Sayfa
 app.use('/', homeRoutes);
 

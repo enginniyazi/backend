@@ -1,0 +1,23 @@
+# backend/docker-compose.yml
+
+version: '3.8' # Dosya formatının versiyonu
+
+services:
+  # 'db' adında bir servis (konteyner) tanımlıyoruz
+  postgres-db:
+    image: postgres:15-alpine # Hangi imajı kullanacağımızı belirtiyoruz (PostgreSQL 15'in hafif bir versiyonu)
+    restart: always # Docker yeniden başladığında bu konteyner de başlasın
+    environment:
+      # Veritabanı oluşturulurken kullanılacak olan kullanıcı adı, şifre ve veritabanı adı
+      # Bunları .env dosyamızdaki DATABASE_URL ile eşleştireceğiz
+      POSTGRES_USER: yowauser
+      POSTGRES_PASSWORD: yowapassword
+      POSTGRES_DB: yowa_academy_dev
+    ports:
+      # Bizim bilgisayarımızın 5432 portuna gelen istekleri,
+      # konteynerin içindeki 5432 portuna yönlendir.
+      - '5432:5432'
+    volumes:
+      # (İsteğe bağlı ama önerilen) Veritabanı verilerini bilgisayarımızda bir klasörde
+      # kalıcı olarak saklamak için. Bu sayede konteyner silinse bile verilerimiz kaybolmaz.
+      - ./postgres-data:/var/lib/postgresql/data
